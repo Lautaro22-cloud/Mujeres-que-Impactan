@@ -712,6 +712,24 @@
     window.scrollTo(0, 0);
   }
   window.addEventListener('load', function(){ window.scrollTo(0, 0); });
+
+  // Carga (y autoplay) del VSL recién cuando la sección entra en pantalla.
+  document.addEventListener('DOMContentLoaded', function(){
+    var vslFrame = document.getElementById('vsl-frame');
+    var vslIframe = document.getElementById('vsl-iframe');
+    if(!vslFrame || !vslIframe) return;
+
+    var vslObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          vslIframe.src = vslIframe.getAttribute('data-src');
+          vslObserver.unobserve(vslFrame);
+        }
+      });
+    }, {threshold: 0.5});
+
+    vslObserver.observe(vslFrame);
+  });
 </script>
 </head>
 <body>
@@ -738,10 +756,14 @@
 
     <!-- VSL de Mar (Vimeo). muted=1 sumado a tus parámetros: sin esto, la mayoría
          de los navegadores (Chrome, Safari, in-app browser de Instagram) bloquean
-         el autoplay directamente y el video ni arranca. -->
-    <div class="video-frame">
+         el autoplay directamente y el video ni arranca.
+         El iframe arranca SIN src (ver data-src) — un script más abajo recién
+         lo carga cuando esta sección entra en pantalla, así el autoplay se
+         dispara al llegar acá y no apenas se abre la landing. -->
+    <div class="video-frame" id="vsl-frame">
       <iframe
-        src="https://player.vimeo.com/video/1217744577?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=1&amp;muted=1"
+        id="vsl-iframe"
+        data-src="https://player.vimeo.com/video/1217744577?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=1&amp;muted=1"
         width="1920" height="1080" frameborder="0"
         allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
         referrerpolicy="strict-origin-when-cross-origin"
