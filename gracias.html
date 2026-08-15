@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Recibí tu aplicación! · Mujeres que Impactan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2A2019;
+    --ink-soft:#4A3C32;
+    --paper:#F5EFE3;
+    --paper-deep:#EBE1CE;
+    --wine:#3D2E8C;
+    --wine-deep:#241A5E;
+    --sage:#63735A;
+    --line: rgba(42,32,25,0.14);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2{font-family:'Fraunces', serif; font-weight:500; line-height:1.12; color:var(--ink);}
+  .card{max-width:560px; text-align:center;}
+  .check-badge{
+    width:64px; height:64px;
+    border-radius:50%;
+    background:var(--sage);
+    color:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px;
+    margin:0 auto 26px;
+  }
+  .eyebrow{
+    font-weight:700; font-size:12.5px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--wine); margin-bottom:16px; display:block;
+  }
+  h1{font-size:clamp(1.8rem, 5vw, 2.5rem); margin-bottom:18px;}
+  p{font-size:17px; color:var(--ink-soft); margin-bottom:14px;}
+  .steps{
+    text-align:left;
+    background:var(--paper-deep);
+    border-radius:8px;
+    padding:26px 28px;
+    margin:32px 0;
+  }
+  .steps p{margin-bottom:10px; font-size:15px;}
+  .steps p:last-child{margin-bottom:0;}
+  .steps strong{color:var(--ink); font-family:'Fraunces', serif; font-weight:600;}
+  a.btn{
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--wine); color:#F8F1E4;
+    font-weight:700; font-size:15.5px;
+    padding:15px 28px; border-radius:3px;
+    text-decoration:none; margin-top:8px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="check-badge">✓</div>
+    <span class="eyebrow">Aplicación recibida</span>
+    <h1>¡Listo! Ya tengo tu aplicación.</h1>
+    <p>La voy a revisar con atención en las próximas horas.</p>
+
+    <div class="steps">
+      <p><strong>1.</strong> Voy a leer tus respuestas con calma, no es un trámite automático.</p>
+      <p><strong>2.</strong> Te voy a escribir por WhatsApp al número que dejaste para coordinar tu llamada.</p>
+      <p><strong>3.</strong> En esa llamada vamos a ver juntas, sin presión, si Mujeres que Impactan es el proceso correcto para vos en este momento.</p>
+    </div>
+
+    <p style="font-size:14.5px;">Mientras tanto, revisá que tu WhatsApp esté bien escrito — es el único dato que necesito para contactarte.</p>
+  </div>
+</body>
+</html>
