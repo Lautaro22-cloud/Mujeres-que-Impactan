@@ -25,6 +25,7 @@ fbq('track', 'PageView');
 src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
+
 <style>
   :root{
     --ink:#2A2019;
@@ -41,63 +42,95 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     background:var(--paper);
     color:var(--ink);
     font-family:'Public Sans', sans-serif;
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:32px 20px;
     -webkit-font-smoothing:antialiased;
   }
-  h1,h2{font-family:'Fraunces', serif; font-weight:500; line-height:1.12; color:var(--ink);}
-  .card{max-width:560px; text-align:center;}
+  h1,h2{font-family:'Fraunces', serif; font-weight:500; line-height:1.15; color:var(--ink);}
+  .wrap{max-width:760px; margin:0 auto; padding:56px 24px 80px;}
+
+  .header{text-align:center; margin-bottom:36px;}
   .check-badge{
-    width:64px; height:64px;
+    width:56px; height:56px;
     border-radius:50%;
     background:var(--sage);
     color:var(--paper);
     display:flex; align-items:center; justify-content:center;
-    font-size:30px;
-    margin:0 auto 26px;
+    font-size:26px;
+    margin:0 auto 20px;
   }
   .eyebrow{
     font-weight:700; font-size:12.5px; letter-spacing:0.14em;
-    text-transform:uppercase; color:var(--wine); margin-bottom:16px; display:block;
+    text-transform:uppercase; color:var(--wine); margin-bottom:14px; display:block;
   }
-  h1{font-size:clamp(1.8rem, 5vw, 2.5rem); margin-bottom:18px;}
-  p{font-size:17px; color:var(--ink-soft); margin-bottom:14px;}
-  .steps{
-    text-align:left;
-    background:var(--paper-deep);
+  h1{font-size:clamp(1.7rem, 4.6vw, 2.3rem); margin-bottom:14px;}
+  .header p{font-size:16.5px; color:var(--ink-soft); max-width:520px; margin:0 auto;}
+
+  .video-frame{
+    aspect-ratio:16/9;
+    margin:0 auto 56px;
     border-radius:8px;
-    padding:26px 28px;
-    margin:32px 0;
+    background:var(--ink);
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 14px 34px rgba(0,0,0,0.18);
   }
-  .steps p{margin-bottom:10px; font-size:15px;}
-  .steps p:last-child{margin-bottom:0;}
-  .steps strong{color:var(--ink); font-family:'Fraunces', serif; font-weight:600;}
-  a.btn{
-    display:inline-flex; align-items:center; gap:10px;
-    background:var(--wine); color:#F8F1E4;
-    font-weight:700; font-size:15.5px;
-    padding:15px 28px; border-radius:3px;
-    text-decoration:none; margin-top:8px;
+  .video-frame iframe{
+    position:absolute; inset:0; width:100%; height:100%; border:0;
+  }
+
+  .booking-head{text-align:center; margin-bottom:24px;}
+  .booking-head h2{font-size:clamp(1.5rem, 3.4vw, 1.9rem); margin-bottom:10px;}
+  .booking-head p{font-size:15.5px; color:var(--ink-soft);}
+
+  .calendly-wrap{
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 10px 28px rgba(0,0,0,0.14);
+    background:#fff;
+  }
+
+  .whatsapp-note{
+    text-align:center;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:28px;
   }
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="check-badge">✓</div>
-    <span class="eyebrow">Aplicación recibida</span>
-    <h1>¡Listo! Ya tengo tu aplicación.</h1>
-    <p>La voy a revisar con atención en las próximas horas.</p>
-
-    <div class="steps">
-      <p><strong>1.</strong> Voy a leer tus respuestas con calma, no es un trámite automático.</p>
-      <p><strong>2.</strong> Te voy a escribir por WhatsApp al número que dejaste para coordinar tu llamada.</p>
-      <p><strong>3.</strong> En esa llamada vamos a ver juntas, sin presión, si Mujeres que Impactan es el proceso correcto para vos en este momento.</p>
+  <div class="wrap">
+    <div class="header">
+      <div class="check-badge">✓</div>
+      <span class="eyebrow">Aplicación recibida</span>
+      <h1>¡Listo! Ya tengo tu aplicación.</h1>
+      <p>Mirá este video antes de reservar tu llamada — te cuento un poco más sobre el paso que sigue.</p>
     </div>
 
-    <p style="font-size:14.5px;">Mientras tanto, revisá que tu WhatsApp esté bien escrito — es el único dato que necesito para contactarte.</p>
+    <!-- Video de bienvenida (Vimeo). Autoplay muteado agregado para que arranque
+         solo al cargar la página — es la única pieza de contenido de esta página,
+         así que no necesita esperar a que se haga scroll como el VSL de la landing.
+         Si preferís que el usuario lo dispare a mano, se saca autoplay=1&muted=1. -->
+    <div class="video-frame">
+      <iframe
+        src="https://player.vimeo.com/video/1217752467?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=1&amp;muted=1"
+        width="1920" height="1080" frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        title="Gracias por llenar el formulario y Felicitaciones!">
+      </iframe>
+    </div>
+
+    <div class="booking-head">
+      <h2>Reservá tu llamada</h2>
+      <p>Elegí el día y horario que mejor te quede.</p>
+    </div>
+
+    <!-- Widget de Calendly -->
+    <div class="calendly-wrap">
+      <div class="calendly-inline-widget" data-url="https://calendly.com/mar-alfonso/60" style="min-width:320px;height:700px;"></div>
+      <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    </div>
+
+    <p class="whatsapp-note">Si no ves horarios que te sirvan o tenés dudas antes de agendar, escribime por WhatsApp al número que dejaste en el formulario.</p>
   </div>
 </body>
 </html>
