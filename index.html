@@ -1037,12 +1037,33 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       </div>
 
       <div class="field">
-        <label for="f-dedicacion">¿A qué te dedicás y hace cuánto tiempo? *</label>
-        <input required id="f-dedicacion" name="dedicacion" type="text">
+        <label for="f-dedicacion">¿A qué te dedicás? *</label>
+        <select required id="f-dedicacion" name="dedicacion">
+          <option value="" disabled selected>Seleccioná una opción</option>
+          <option value="Psicóloga/Terapeuta">Psicóloga/Terapeuta</option>
+          <option value="Coach/Mentora">Coach/Mentora</option>
+          <option value="Emprendedora profesional">Emprendedora profesional</option>
+          <option value="Otro servicio independiente">Otro servicio independiente</option>
+        </select>
+      </div>
+
+      <div class="field" id="dedicacion-otro-wrap" hidden>
+        <label for="f-dedicacion-otro">Contanos cuál *</label>
+        <input id="f-dedicacion-otro" name="dedicacionOtro" type="text">
       </div>
 
       <div class="field">
-        <label for="f-servicio">¿Cómo está actualmente tu servicio? Describí brevemente: cuántos clientes tenés, cómo llegan a vos y qué ingresos estás generando en promedio por mes. *</label>
+        <label for="f-experiencia">¿Cuántos años de experiencia tenés? *</label>
+        <select required id="f-experiencia" name="experiencia">
+          <option value="" disabled selected>Seleccioná una opción</option>
+          <option value="Menos de 1 año">Menos de 1 año</option>
+          <option value="De 1 a 3 años">De 1 a 3 años</option>
+          <option value="Más de 3 años">Más de 3 años</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="f-servicio">¿Cómo está actualmente tu servicio? Describí brevemente: cuántos clientes tenés y cómo llegan a vos. *</label>
         <textarea required id="f-servicio" name="servicioActual" rows="3"></textarea>
       </div>
 
@@ -1062,13 +1083,13 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       </div>
 
       <div class="field">
-        <label for="f-rango">¿Qué rango de inversión tenés contemplado hoy para hacer crecer tu servicio? *</label>
+        <label for="f-rango">Si al final de la llamada ambas estamos de acuerdo y podemos comenzar a trabajar juntas, ¿qué rango de inversión podrías destinar para hacer crecer tu servicio? *</label>
         <select required id="f-rango" name="rangoInversion">
           <option value="" disabled selected>Seleccioná una opción</option>
           <option value="Más de 1.000 USD">Más de 1.000 USD</option>
           <option value="Entre 600 y 1.000 USD">Entre 600 y 1.000 USD</option>
           <option value="Entre 300 y 600 USD">Entre 300 y 600 USD</option>
-          <option value="No puedo invertir (Por favor, no agendes. No podremos ayudarte)">No puedo invertir (Por favor, no agendes. No podremos ayudarte)</option>
+          <option value="No estoy en condiciones de invertir (en este caso, por favor no agendes, no podremos ayudarte)">No estoy en condiciones de invertir (en este caso, por favor no agendes, no podremos ayudarte)</option>
         </select>
       </div>
 
@@ -1184,7 +1205,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   //    éxito apenas el request se envía sin error de red. Es el patrón estándar
   //    para este tipo de integración.
   (function(){
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9xdtv3rx9H94-xMTKLQ_Lmon4U0F5ixCtVmsvRAlxHsKsjRefnpzzUXLtSCetRRcz/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIBD1dUEolCjGOx8dhY6dXLDb8N934h-IIPVoT7hq4e6ApJoNJVhZTast2MMNTYA-c/exec";
     var form = document.getElementById('qualifying-form');
     var errorEl = document.getElementById('form-error');
     if(!form) return;
@@ -1201,6 +1222,19 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     // value="" de las opciones del <select> de arriba. Solo queda afuera
     // quien elige explícitamente que no puede invertir.
     var RANGOS_CALIFICAN = ['Entre 300 y 600 USD', 'Entre 600 y 1.000 USD', 'Más de 1.000 USD'];
+
+    // Muestra/oculta el campo de texto libre cuando eligen "Otro servicio independiente".
+    var dedicacionSelect = document.getElementById('f-dedicacion');
+    var dedicacionOtroWrap = document.getElementById('dedicacion-otro-wrap');
+    var dedicacionOtroInput = document.getElementById('f-dedicacion-otro');
+    if (dedicacionSelect && dedicacionOtroWrap && dedicacionOtroInput) {
+      dedicacionSelect.addEventListener('change', function(){
+        var esOtro = dedicacionSelect.value === 'Otro servicio independiente';
+        dedicacionOtroWrap.hidden = !esOtro;
+        dedicacionOtroInput.required = esOtro;
+        if (!esOtro) dedicacionOtroInput.value = '';
+      });
+    }
 
     form.addEventListener('submit', function(e){
       e.preventDefault();
