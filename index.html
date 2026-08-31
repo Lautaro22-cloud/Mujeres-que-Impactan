@@ -722,14 +722,35 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   }
 </style>
 <script>
-  // Salvaguarda: si la página se abre con un #anchor ya en la URL (típico si el
-  // link del anuncio quedó mal armado apuntando a #formulario), lo removemos
-  // y forzamos el scroll al inicio para que no se salte todo el copy de venta.
+  // Salvaguarda contra el salto directo al formulario al abrir desde el anuncio.
+  // Tiene 3 capas porque el navegador interno de Instagram (IAB) puede saltarse
+  // la corrección simple de una sola vez:
+  //
+  // 1) history.scrollRestoration = 'manual': por defecto, los navegadores
+  //    "recuerdan" en qué scroll quedaste en una URL y lo restauran solo. Si
+  //    alguien (vos probando, o el propio IAB reutilizando una pestaña/caché)
+  //    ya había scrolleado hasta el formulario en esta misma URL antes, el
+  //    navegador puede reponer ese scroll en la visita siguiente aunque no
+  //    haya ningún #ancla en el link. Esta línea lo desactiva.
+  // 2) Si además la URL llega con un #ancla (ej: el link del anuncio quedó
+  //    mal armado apuntando a #formulario), lo removemos apenas se puede.
+  // 3) Forzamos scroll a 0 en varios momentos (ya, al cargar, y con un
+  //    pequeño delay) porque algunos in-app browsers procesan el salto al
+  //    ancla en un momento distinto al de un navegador normal.
+  if ('scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual';
+  }
   if (window.location.hash) {
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    window.scrollTo(0, 0);
   }
+  window.scrollTo(0, 0);
   window.addEventListener('load', function(){ window.scrollTo(0, 0); });
+  window.addEventListener('hashchange', function(){
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    window.scrollTo(0, 0);
+  });
+  setTimeout(function(){ window.scrollTo(0, 0); }, 50);
+  setTimeout(function(){ window.scrollTo(0, 0); }, 400);
 
   // Carga (y autoplay) del VSL recién cuando la sección entra en pantalla.
   document.addEventListener('DOMContentLoaded', function(){
