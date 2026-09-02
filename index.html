@@ -208,6 +208,24 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     border:0;
   }
 
+  .step-label{
+    display:block;
+    text-align:center;
+    font-weight:800;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--wine);
+    margin-bottom:14px;
+  }
+  .step-caption{
+    text-align:center;
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin:-16px 0 28px;
+  }
+
   /* ---------- TRUST BAR ---------- */
   .trustbar{
     border-top:1px solid var(--line);
@@ -556,6 +574,39 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   .guarantee-copy p{color:var(--ink-soft); font-size:15.5px;}
 
   /* ---------- FORMULARIO ---------- */
+  .filter-card{
+    max-width:640px;
+    margin:0 auto 48px;
+    background:var(--ink);
+    border-radius:8px;
+    padding:32px 34px;
+    text-align:center;
+  }
+  .filter-heading{
+    display:block;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:16px;
+  }
+  .filter-card p{
+    color:#D9CFC0;
+    font-size:15.5px;
+    line-height:1.55;
+  }
+  .filter-divider{
+    border:none;
+    border-top:1px solid rgba(217,207,192,0.2);
+    margin:20px auto;
+    width:80%;
+  }
+  .filter-bold{
+    color:var(--paper);
+    font-weight:700;
+  }
+
   .qualify-form{
     max-width:640px;
     margin:0 auto;
@@ -699,6 +750,18 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     *{transition:none !important;}
   }
 
+  /* ---------- CANDADO DEL VSL ---------- */
+  .locked-wrapper.locked{
+    display:none;
+  }
+  .locked-wrapper{
+    animation:fade-in-unlock .5s ease;
+  }
+  @keyframes fade-in-unlock{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
   /* ---------- STICKY CTA (floating) ---------- */
   .sticky-cta{
     position:fixed;
@@ -731,6 +794,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     .sticky-cta-text{display:block;}
   }
 </style>
+<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
   // Salvaguarda contra el salto directo al formulario al abrir desde el anuncio.
   // Tiene 3 capas porque el navegador interno de Instagram (IAB) puede saltarse
@@ -762,6 +826,23 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   setTimeout(function(){ window.scrollTo(0, 0); }, 50);
   setTimeout(function(){ window.scrollTo(0, 0); }, 400);
 
+  // ===== CANDADO DEL VSL =====
+  // El resto de la página (formulario incluido) queda oculto hasta que el
+  // video llegue a 4:20 (260 segundos). Si ya se desbloqueó antes en esta
+  // misma pestaña (sessionStorage), arranca desbloqueado de una — así si
+  // alguien sube/baja la página no vuelve a quedar bloqueada.
+  var mqiUnlocked = false;
+  function unlockLanding(){
+    if (mqiUnlocked) return;
+    mqiUnlocked = true;
+    try { sessionStorage.setItem('mqi_unlocked', '1'); } catch(e) {}
+    var wrapper = document.getElementById('locked-wrapper');
+    if (wrapper) wrapper.classList.remove('locked');
+  }
+  try {
+    if (sessionStorage.getItem('mqi_unlocked') === '1') unlockLanding();
+  } catch(e) {}
+
   // Carga (y autoplay) del VSL recién cuando la sección entra en pantalla.
   document.addEventListener('DOMContentLoaded', function(){
     var vslFrame = document.getElementById('vsl-frame');
@@ -773,6 +854,21 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
         if(entry.isIntersecting){
           vslIframe.src = vslIframe.getAttribute('data-src');
           vslObserver.unobserve(vslFrame);
+
+          // Vía principal: escuchar el progreso real del video con la API de Vimeo.
+          try {
+            if (window.Vimeo && window.Vimeo.Player) {
+              var vslPlayer = new Vimeo.Player(vslIframe);
+              vslPlayer.on('timeupdate', function(data){
+                if (data.seconds >= 260) unlockLanding();
+              });
+            }
+          } catch(e) {}
+
+          // Vía de respaldo: si por lo que sea la API de Vimeo falla (bloqueada,
+          // no carga, cambia de versión, etc.), esto igual desbloquea a los 4:20
+          // reales desde que arrancó el video, para no dejar la landing trabada.
+          setTimeout(unlockLanding, 260000);
         }
       });
     }, {threshold: 0.5});
@@ -803,6 +899,8 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       <div class="belief-line belief-new"><span class="tag">Lo&nbsp;que&nbsp;vas&nbsp;a&nbsp;saber</span><span>"Tengo una oferta clara, deseada y vendible que puede escalar sin que yo esté siempre disponible."</span></div>
     </div>
 
+    <span class="step-label">Paso 1 · Mirá el video</span>
+
     <!-- VSL de Mar (Vimeo). muted=1 sumado a tus parámetros: sin esto, la mayoría
          de los navegadores (Chrome, Safari, in-app browser de Instagram) bloquean
          el autoplay directamente y el video ni arranca.
@@ -820,10 +918,126 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       </iframe>
     </div>
 
-    <div class="btn-row">
-      <a href="#formulario" class="btn">Quiero aplicar al programa <span class="btn-arrow">→</span></a>
-      <span class="btn-note">Cupos limitados · Acompañamiento 100% personalizado</span>
+    <p class="step-caption">Solicitá tu reunión cuando finalice el video</p>
+  </div>
+</section>
+
+<!-- A partir de acá, todo el contenido (incluido el formulario) queda
+     bloqueado hasta que el VSL llegue al minuto 4:20. Ver el bloque
+     <script> al final del archivo (buscar "CANDADO DEL VSL"). -->
+<div id="locked-wrapper" class="locked">
+<section id="formulario">
+  <div class="wrap">
+    <div class="filter-card">
+      <span class="filter-heading">Antes de aplicar, leé esto</span>
+      <p>Este proceso es para mujeres profesionales de vocación sanadora que ya tienen trayectoria, saben exactamente cuánto están dejando de facturar por no tener una oferta propia, y están dispuestas a comprometerse 90 días para resolverlo de una vez.</p>
+      <hr class="filter-divider">
+      <p class="filter-bold">Si estás buscando un curso rápido o una solución de bajo costo, este no es tu proceso.</p>
     </div>
+
+    <div class="section-head">
+      <span class="eyebrow">Último paso</span>
+      <h2>Aplicá para reservar tu llamada</h2>
+      <p>Completá el formulario para que pueda conocer tu situación antes de la llamada — así la conversación va directo a lo que importa.</p>
+    </div>
+
+    <form id="qualifying-form" class="qualify-form">
+      <!-- Campos ocultos: se completan solos con JS a partir de los parámetros
+           de la URL del anuncio (ej: ?utm_source=instagram&utm_medium=paid&utm_campaign=mqi-lanzamiento).
+           No se muestran al usuario, solo viajan junto con el resto de la respuesta. -->
+      <input type="hidden" id="f-utm_source" name="utm_source">
+      <input type="hidden" id="f-utm_medium" name="utm_medium">
+      <input type="hidden" id="f-utm_campaign" name="utm_campaign">
+      <input type="hidden" id="f-utm_content" name="utm_content">
+      <input type="hidden" id="f-utm_term" name="utm_term">
+      <input type="hidden" id="f-fbclid" name="fbclid">
+
+      <div class="form-row two-col">
+        <div class="field">
+          <label for="f-nombre">Nombre *</label>
+          <input required id="f-nombre" name="nombre" type="text">
+        </div>
+        <div class="field">
+          <label for="f-apellido">Apellido *</label>
+          <input required id="f-apellido" name="apellido" type="text">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-email">Correo electrónico *</label>
+        <input required id="f-email" name="email" type="email">
+      </div>
+
+      <div class="field">
+        <label for="f-whatsapp">WhatsApp *</label>
+        <input required id="f-whatsapp" name="whatsapp" type="tel" placeholder="+54 9 11 1234 5678">
+      </div>
+
+      <div class="field">
+        <label for="f-dedicacion">¿A qué te dedicás? *</label>
+        <select required id="f-dedicacion" name="dedicacion">
+          <option value="" disabled selected>Seleccioná una opción</option>
+          <option value="Psicóloga/Terapeuta">Psicóloga/Terapeuta</option>
+          <option value="Coach/Mentora">Coach/Mentora</option>
+          <option value="Emprendedora profesional">Emprendedora profesional</option>
+          <option value="Otro servicio independiente">Otro servicio independiente</option>
+        </select>
+      </div>
+
+      <div class="field" id="dedicacion-otro-wrap" hidden>
+        <label for="f-dedicacion-otro">Contanos cuál *</label>
+        <input id="f-dedicacion-otro" name="dedicacionOtro" type="text">
+      </div>
+
+      <div class="field">
+        <label for="f-experiencia">¿Cuántos años de experiencia tenés? *</label>
+        <select required id="f-experiencia" name="experiencia">
+          <option value="" disabled selected>Seleccioná una opción</option>
+          <option value="Menos de 1 año">Menos de 1 año</option>
+          <option value="De 1 a 3 años">De 1 a 3 años</option>
+          <option value="Más de 3 años">Más de 3 años</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="f-servicio">¿Cómo está actualmente tu servicio? Describí brevemente: cuántos clientes tenés y cómo llegan a vos. *</label>
+        <textarea required id="f-servicio" name="servicioActual" rows="3"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="f-desafios">¿Cuáles son los mayores desafíos que enfrentás hoy para hacer crecer tu servicio? Explayate en tu respuesta *</label>
+        <textarea required id="f-desafios" name="desafios" rows="3"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="f-probado">¿Qué probaste anteriormente para resolverlo y qué resultado obtuviste? *</label>
+        <textarea required id="f-probado" name="probado" rows="3"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="f-objetivos">¿Qué 3 cosas específicas te gustaría lograr en los próximos 6 meses? *</label>
+        <textarea required id="f-objetivos" name="objetivos" rows="3"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="f-rango">Si al final de la llamada ambas estamos de acuerdo y podemos comenzar a trabajar juntas, ¿qué rango de inversión podrías destinar para hacer crecer tu servicio? *</label>
+        <select required id="f-rango" name="rangoInversion">
+          <option value="" disabled selected>Seleccioná una opción</option>
+          <option value="Más de 1.000 USD">Más de 1.000 USD</option>
+          <option value="Entre 600 y 1.000 USD">Entre 600 y 1.000 USD</option>
+          <option value="Entre 300 y 600 USD">Entre 300 y 600 USD</option>
+          <option value="No estoy en condiciones de invertir (en este caso, por favor no agendes, no podremos ayudarte)">No estoy en condiciones de invertir (en este caso, por favor no agendes, no podremos ayudarte)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="f-extra">¿Querés compartir algo extra que consideres importante que yo sepa de vos o de tu experiencia? (opcional)</label>
+        <textarea id="f-extra" name="extra" rows="3"></textarea>
+      </div>
+
+      <button type="submit" class="btn form-submit">Enviar mi aplicación <span class="btn-arrow">→</span></button>
+      <p class="form-error" id="form-error" hidden>Hubo un problema al enviar tu aplicación. Probá de nuevo en un momento.</p>
+    </form>
   </div>
 </section>
 
@@ -1027,113 +1241,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
 <!-- ================= FORMULARIO CALIFICADOR ================= -->
 <!-- ESPACIO RESERVADO — insertar acá el embed real del formulario calificador
      (Typeform / Google Form / Tally, etc.) que filtra antes de la agenda. -->
-<section id="formulario">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Último paso</span>
-      <h2>Aplicá para reservar tu llamada</h2>
-      <p>Completá el formulario para que pueda conocer tu situación antes de la llamada — así la conversación va directo a lo que importa.</p>
-    </div>
-
-    <form id="qualifying-form" class="qualify-form">
-      <!-- Campos ocultos: se completan solos con JS a partir de los parámetros
-           de la URL del anuncio (ej: ?utm_source=instagram&utm_medium=paid&utm_campaign=mqi-lanzamiento).
-           No se muestran al usuario, solo viajan junto con el resto de la respuesta. -->
-      <input type="hidden" id="f-utm_source" name="utm_source">
-      <input type="hidden" id="f-utm_medium" name="utm_medium">
-      <input type="hidden" id="f-utm_campaign" name="utm_campaign">
-      <input type="hidden" id="f-utm_content" name="utm_content">
-      <input type="hidden" id="f-utm_term" name="utm_term">
-      <input type="hidden" id="f-fbclid" name="fbclid">
-
-      <div class="form-row two-col">
-        <div class="field">
-          <label for="f-nombre">Nombre *</label>
-          <input required id="f-nombre" name="nombre" type="text">
-        </div>
-        <div class="field">
-          <label for="f-apellido">Apellido *</label>
-          <input required id="f-apellido" name="apellido" type="text">
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="f-email">Correo electrónico *</label>
-        <input required id="f-email" name="email" type="email">
-      </div>
-
-      <div class="field">
-        <label for="f-whatsapp">WhatsApp *</label>
-        <input required id="f-whatsapp" name="whatsapp" type="tel" placeholder="+54 9 11 1234 5678">
-      </div>
-
-      <div class="field">
-        <label for="f-dedicacion">¿A qué te dedicás? *</label>
-        <select required id="f-dedicacion" name="dedicacion">
-          <option value="" disabled selected>Seleccioná una opción</option>
-          <option value="Psicóloga/Terapeuta">Psicóloga/Terapeuta</option>
-          <option value="Coach/Mentora">Coach/Mentora</option>
-          <option value="Emprendedora profesional">Emprendedora profesional</option>
-          <option value="Otro servicio independiente">Otro servicio independiente</option>
-        </select>
-      </div>
-
-      <div class="field" id="dedicacion-otro-wrap" hidden>
-        <label for="f-dedicacion-otro">Contanos cuál *</label>
-        <input id="f-dedicacion-otro" name="dedicacionOtro" type="text">
-      </div>
-
-      <div class="field">
-        <label for="f-experiencia">¿Cuántos años de experiencia tenés? *</label>
-        <select required id="f-experiencia" name="experiencia">
-          <option value="" disabled selected>Seleccioná una opción</option>
-          <option value="Menos de 1 año">Menos de 1 año</option>
-          <option value="De 1 a 3 años">De 1 a 3 años</option>
-          <option value="Más de 3 años">Más de 3 años</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="f-servicio">¿Cómo está actualmente tu servicio? Describí brevemente: cuántos clientes tenés y cómo llegan a vos. *</label>
-        <textarea required id="f-servicio" name="servicioActual" rows="3"></textarea>
-      </div>
-
-      <div class="field">
-        <label for="f-desafios">¿Cuáles son los mayores desafíos que enfrentás hoy para hacer crecer tu servicio? Explayate en tu respuesta *</label>
-        <textarea required id="f-desafios" name="desafios" rows="3"></textarea>
-      </div>
-
-      <div class="field">
-        <label for="f-probado">¿Qué probaste anteriormente para resolverlo y qué resultado obtuviste? *</label>
-        <textarea required id="f-probado" name="probado" rows="3"></textarea>
-      </div>
-
-      <div class="field">
-        <label for="f-objetivos">¿Qué 3 cosas específicas te gustaría lograr en los próximos 6 meses? *</label>
-        <textarea required id="f-objetivos" name="objetivos" rows="3"></textarea>
-      </div>
-
-      <div class="field">
-        <label for="f-rango">Si al final de la llamada ambas estamos de acuerdo y podemos comenzar a trabajar juntas, ¿qué rango de inversión podrías destinar para hacer crecer tu servicio? *</label>
-        <select required id="f-rango" name="rangoInversion">
-          <option value="" disabled selected>Seleccioná una opción</option>
-          <option value="Más de 1.000 USD">Más de 1.000 USD</option>
-          <option value="Entre 600 y 1.000 USD">Entre 600 y 1.000 USD</option>
-          <option value="Entre 300 y 600 USD">Entre 300 y 600 USD</option>
-          <option value="No estoy en condiciones de invertir (en este caso, por favor no agendes, no podremos ayudarte)">No estoy en condiciones de invertir (en este caso, por favor no agendes, no podremos ayudarte)</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="f-extra">¿Querés compartir algo extra que consideres importante que yo sepa de vos o de tu experiencia? (opcional)</label>
-        <textarea id="f-extra" name="extra" rows="3"></textarea>
-      </div>
-
-      <button type="submit" class="btn form-submit">Enviar mi aplicación <span class="btn-arrow">→</span></button>
-      <p class="form-error" id="form-error" hidden>Hubo un problema al enviar tu aplicación. Probá de nuevo en un momento.</p>
-    </form>
-  </div>
-</section>
 
 <!-- ================= FAQ ================= -->
 <section class="band-deep" id="faq">
@@ -1194,6 +1301,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   <span class="sticky-cta-text">Cupos limitados · Acompañamiento 1:1</span>
   <a href="#formulario" class="btn">Quiero aplicar al programa <span class="btn-arrow">→</span></a>
 </div>
+</div><!-- /locked-wrapper -->
 
 <script>
   // Aparece recién después de pasar el hero (para no duplicar el CTA de arriba
