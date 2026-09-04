@@ -742,6 +742,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     .sticky-cta-text{display:block;}
   }
 </style>
+<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
   // Salvaguarda contra el salto directo al formulario al abrir desde el anuncio.
   // Tiene 3 capas porque el navegador interno de Instagram (IAB) puede saltarse
@@ -773,7 +774,12 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   setTimeout(function(){ window.scrollTo(0, 0); }, 50);
   setTimeout(function(){ window.scrollTo(0, 0); }, 400);
 
-  // Carga (y autoplay) del VSL recién cuando la sección entra en pantalla.
+  // Carga del VSL recién cuando la sección entra en pantalla, y fuerza el
+  // play por API en vez de confiar solo en el parámetro autoplay=1 de la URL
+  // — algunas cuentas de Vimeo (planes gratuitos/Plus) ignoran ese parámetro
+  // y solo permiten autoplay real en planes pagos. Pedirle "play" directo al
+  // reproductor por la API es una acción de control normal, no un embed
+  // especial, así que no depende de ese permiso.
   document.addEventListener('DOMContentLoaded', function(){
     var vslFrame = document.getElementById('vsl-frame');
     var vslIframe = document.getElementById('vsl-iframe');
@@ -784,6 +790,18 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
         if(entry.isIntersecting){
           vslIframe.src = vslIframe.getAttribute('data-src');
           vslObserver.unobserve(vslFrame);
+
+          try {
+            if (window.Vimeo && window.Vimeo.Player) {
+              var vslPlayer = new Vimeo.Player(vslIframe);
+              vslPlayer.setVolume(0).then(function(){
+                return vslPlayer.play();
+              }).catch(function(){
+                // Si el navegador igual bloquea el autoplay por alguna política
+                // propia, no pasa nada: queda el botón de play normal de Vimeo.
+              });
+            }
+          } catch(e) {}
         }
       });
     }, {threshold: 0.5});
