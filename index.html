@@ -218,13 +218,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     color:var(--wine);
     margin-bottom:14px;
   }
-  .step-caption{
-    text-align:center;
-    font-size:14.5px;
-    font-weight:600;
-    color:var(--ink-soft);
-    margin:-16px 0 28px;
-  }
 
   /* ---------- TRUST BAR ---------- */
   .trustbar{
@@ -574,39 +567,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   .guarantee-copy p{color:var(--ink-soft); font-size:15.5px;}
 
   /* ---------- FORMULARIO ---------- */
-  .filter-card{
-    max-width:640px;
-    margin:0 auto 48px;
-    background:var(--ink);
-    border-radius:8px;
-    padding:32px 34px;
-    text-align:center;
-  }
-  .filter-heading{
-    display:block;
-    font-weight:800;
-    font-size:12.5px;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    color:var(--gold);
-    margin-bottom:16px;
-  }
-  .filter-card p{
-    color:#D9CFC0;
-    font-size:15.5px;
-    line-height:1.55;
-  }
-  .filter-divider{
-    border:none;
-    border-top:1px solid rgba(217,207,192,0.2);
-    margin:20px auto;
-    width:80%;
-  }
-  .filter-bold{
-    color:var(--paper);
-    font-weight:700;
-  }
-
   .qualify-form{
     max-width:640px;
     margin:0 auto;
@@ -750,18 +710,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     *{transition:none !important;}
   }
 
-  /* ---------- CANDADO DEL VSL ---------- */
-  #locked-wrapper.locked{
-    display:none;
-  }
-  #locked-wrapper{
-    animation:fade-in-unlock .5s ease;
-  }
-  @keyframes fade-in-unlock{
-    from{opacity:0; transform:translateY(6px);}
-    to{opacity:1; transform:translateY(0);}
-  }
-
   /* ---------- STICKY CTA (floating) ---------- */
   .sticky-cta{
     position:fixed;
@@ -794,7 +742,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     .sticky-cta-text{display:block;}
   }
 </style>
-<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
   // Salvaguarda contra el salto directo al formulario al abrir desde el anuncio.
   // Tiene 3 capas porque el navegador interno de Instagram (IAB) puede saltarse
@@ -826,23 +773,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   setTimeout(function(){ window.scrollTo(0, 0); }, 50);
   setTimeout(function(){ window.scrollTo(0, 0); }, 400);
 
-  // ===== CANDADO DEL VSL =====
-  // El resto de la página (formulario incluido) queda oculto hasta que el
-  // video llegue a 4:20 (260 segundos). Si ya se desbloqueó antes en esta
-  // misma pestaña (sessionStorage), arranca desbloqueado de una — así si
-  // alguien sube/baja la página no vuelve a quedar bloqueada.
-  var mqiUnlocked = false;
-  function unlockLanding(){
-    if (mqiUnlocked) return;
-    mqiUnlocked = true;
-    try { sessionStorage.setItem('mqi_unlocked', '1'); } catch(e) {}
-    var wrapper = document.getElementById('locked-wrapper');
-    if (wrapper) wrapper.classList.remove('locked');
-  }
-  try {
-    if (sessionStorage.getItem('mqi_unlocked') === '1') unlockLanding();
-  } catch(e) {}
-
   // Carga (y autoplay) del VSL recién cuando la sección entra en pantalla.
   document.addEventListener('DOMContentLoaded', function(){
     var vslFrame = document.getElementById('vsl-frame');
@@ -854,21 +784,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
         if(entry.isIntersecting){
           vslIframe.src = vslIframe.getAttribute('data-src');
           vslObserver.unobserve(vslFrame);
-
-          // Vía principal: escuchar el progreso real del video con la API de Vimeo.
-          try {
-            if (window.Vimeo && window.Vimeo.Player) {
-              var vslPlayer = new Vimeo.Player(vslIframe);
-              vslPlayer.on('timeupdate', function(data){
-                if (data.seconds >= 260) unlockLanding();
-              });
-            }
-          } catch(e) {}
-
-          // Vía de respaldo: si por lo que sea la API de Vimeo falla (bloqueada,
-          // no carga, cambia de versión, etc.), esto igual desbloquea a los 4:20
-          // reales desde que arrancó el video, para no dejar la landing trabada.
-          setTimeout(unlockLanding, 260000);
         }
       });
     }, {threshold: 0.5});
@@ -917,24 +832,11 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
         title="Mujeres que Impactan Agosto 2026">
       </iframe>
     </div>
-
-    <p class="step-caption">Solicitá tu reunión cuando finalice el video</p>
   </div>
 </section>
 
-<!-- A partir de acá, todo el contenido (incluido el formulario) queda
-     bloqueado hasta que el VSL llegue al minuto 4:20. Ver el bloque
-     <script> al final del archivo (buscar "CANDADO DEL VSL"). -->
-<div id="locked-wrapper" class="locked">
 <section id="formulario">
   <div class="wrap">
-    <div class="filter-card">
-      <span class="filter-heading">Antes de aplicar, leé esto</span>
-      <p>Este proceso es para mujeres profesionales de vocación sanadora que ya tienen trayectoria, saben exactamente cuánto están dejando de facturar por no tener una oferta propia, y están dispuestas a comprometerse 90 días para resolverlo de una vez.</p>
-      <hr class="filter-divider">
-      <p class="filter-bold">Si estás buscando un curso rápido o una solución de bajo costo, este no es tu proceso.</p>
-    </div>
-
     <div class="section-head">
       <span class="eyebrow">Paso 2</span>
       <h2>Llená el formulario para aplicar a la llamada</h2>
@@ -1040,6 +942,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     </form>
   </div>
 </section>
+<div id="after-formulario" style="height:1px;"></div>
 
 <!-- ================= TRUST BAR ================= -->
 <div class="trustbar">
@@ -1301,38 +1204,32 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   <span class="sticky-cta-text">Cupos limitados · Acompañamiento 1:1</span>
   <a href="#formulario" class="btn">Quiero aplicar al programa <span class="btn-arrow">→</span></a>
 </div>
-</div><!-- /locked-wrapper -->
+
 
 <script>
-  // Aparece recién después de pasar el hero (para no duplicar el CTA de arriba
-  // apenas se carga la página) y se oculta de nuevo al llegar al formulario,
-  // ya que ahí el CTA flotante deja de aportar y solo tapa contenido.
+  // Aparece recién después de pasar POR COMPLETO la sección del formulario
+  // (no un porcentaje de ella) — así no aparece a mitad de camino mientras
+  // alguien lo está completando. Se detecta con un marcador invisible de
+  // 1px puesto justo después de que cierra la sección del formulario: si
+  // ese marcador ya quedó arriba del viewport, es que se scrolleó más allá.
   (function(){
     var sticky = document.getElementById('sticky-cta');
-    var hero = document.querySelector('.hero');
-    var formulario = document.getElementById('formulario');
-    if(!sticky || !hero) return;
+    var marker = document.getElementById('after-formulario');
+    if(!sticky || !marker) return;
 
-    var pastHero = false;
-    var inFormulario = false;
+    var pastFormulario = false;
 
-    var heroObserver = new IntersectionObserver(function(entries){
-      pastHero = !entries[0].isIntersecting;
-      update();
-    }, {threshold:0});
-    heroObserver.observe(hero);
+    var markerObserver = new IntersectionObserver(function(entries){
+      var entry = entries[0];
+      if (entry.isIntersecting) {
+        pastFormulario = false;
+      } else {
+        pastFormulario = entry.boundingClientRect.top < 0;
+      }
+      sticky.classList.toggle('is-visible', pastFormulario);
+    }, {threshold: 0});
 
-    if(formulario){
-      var formObserver = new IntersectionObserver(function(entries){
-        inFormulario = entries[0].isIntersecting;
-        update();
-      }, {threshold:0.3});
-      formObserver.observe(formulario);
-    }
-
-    function update(){
-      sticky.classList.toggle('is-visible', pastHero && !inFormulario);
-    }
+    markerObserver.observe(marker);
   })();
 </script>
 
