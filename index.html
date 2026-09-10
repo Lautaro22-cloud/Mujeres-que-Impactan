@@ -858,7 +858,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     <div class="section-head">
       <span class="eyebrow">Paso 2</span>
       <h2>Llená el formulario para aplicar a la llamada</h2>
-      <p>Completá el formulario para que pueda conocer tu situación antes de la llamada — así la conversación va directo a lo que importa.</p>
     </div>
 
     <form id="qualifying-form" class="qualify-form">
@@ -884,11 +883,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       </div>
 
       <div class="field">
-        <label for="f-email">Correo electrónico *</label>
-        <input required id="f-email" name="email" type="email">
-      </div>
-
-      <div class="field">
         <label for="f-whatsapp">WhatsApp *</label>
         <input required id="f-whatsapp" name="whatsapp" type="tel" placeholder="+54 9 11 1234 5678">
       </div>
@@ -900,59 +894,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
           <option value="Psicóloga/Terapeuta">Psicóloga/Terapeuta</option>
           <option value="Coach/Mentora">Coach/Mentora</option>
           <option value="Emprendedora profesional">Emprendedora profesional</option>
-          <option value="Otro servicio independiente">Otro servicio independiente</option>
         </select>
-      </div>
-
-      <div class="field" id="dedicacion-otro-wrap" hidden>
-        <label for="f-dedicacion-otro">Contanos cuál *</label>
-        <input id="f-dedicacion-otro" name="dedicacionOtro" type="text">
-      </div>
-
-      <div class="field">
-        <label for="f-experiencia">¿Cuántos años de experiencia tenés? *</label>
-        <select required id="f-experiencia" name="experiencia">
-          <option value="" disabled selected>Seleccioná una opción</option>
-          <option value="Menos de 1 año">Menos de 1 año</option>
-          <option value="De 1 a 3 años">De 1 a 3 años</option>
-          <option value="Más de 3 años">Más de 3 años</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="f-servicio">¿Cómo está actualmente tu servicio? Describí brevemente: cuántos clientes tenés y cómo llegan a vos. *</label>
-        <textarea required id="f-servicio" name="servicioActual" rows="3"></textarea>
-      </div>
-
-      <div class="field">
-        <label for="f-desafios">¿Cuáles son los mayores desafíos que enfrentás hoy para hacer crecer tu servicio? Explayate en tu respuesta *</label>
-        <textarea required id="f-desafios" name="desafios" rows="3"></textarea>
-      </div>
-
-      <div class="field">
-        <label for="f-probado">¿Qué probaste anteriormente para resolverlo y qué resultado obtuviste? *</label>
-        <textarea required id="f-probado" name="probado" rows="3"></textarea>
-      </div>
-
-      <div class="field">
-        <label for="f-objetivos">¿Qué 3 cosas específicas te gustaría lograr en los próximos 6 meses? *</label>
-        <textarea required id="f-objetivos" name="objetivos" rows="3"></textarea>
-      </div>
-
-      <div class="field">
-        <label for="f-rango">Si al final de la llamada ambas estamos de acuerdo y podemos comenzar a trabajar juntas, ¿qué rango de inversión podrías destinar para hacer crecer tu servicio? *</label>
-        <select required id="f-rango" name="rangoInversion">
-          <option value="" disabled selected>Seleccioná una opción</option>
-          <option value="Más de 1.000 USD">Más de 1.000 USD</option>
-          <option value="Entre 600 y 1.000 USD">Entre 600 y 1.000 USD</option>
-          <option value="Entre 300 y 600 USD">Entre 300 y 600 USD</option>
-          <option value="No estoy en condiciones de invertir (en este caso, por favor no agendes, no podremos ayudarte)">No estoy en condiciones de invertir (en este caso, por favor no agendes, no podremos ayudarte)</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="f-extra">¿Querés compartir algo extra que consideres importante que yo sepa de vos o de tu experiencia? (opcional)</label>
-        <textarea id="f-extra" name="extra" rows="3"></textarea>
       </div>
 
       <button type="submit" class="btn form-submit">Enviar mi aplicación <span class="btn-arrow">→</span></button>
@@ -1259,7 +1201,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   //    éxito apenas el request se envía sin error de red. Es el patrón estándar
   //    para este tipo de integración.
   (function(){
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwk_fPXA0hmFKIbgvrc4imDmHmTR0ar70TV4ezhX6TT2ZZSOVqBKdEwXzw7MAOXGkzF/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6z6fgdwmM0-I7SHEdhkQUbqaPMAL-9mzirJBfFc3VM53V3RdTMy56AbWQYJd4yBuC/exec";
     var form = document.getElementById('qualifying-form');
     var errorEl = document.getElementById('form-error');
     if(!form) return;
@@ -1272,23 +1214,10 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       if(field) field.value = params.get(key) || '';
     });
 
-    // Rangos que se consideran "califica" — tienen que coincidir con los
-    // value="" de las opciones del <select> de arriba. Solo queda afuera
-    // quien elige explícitamente que no puede invertir.
-    var RANGOS_CALIFICAN = ['Entre 300 y 600 USD', 'Entre 600 y 1.000 USD', 'Más de 1.000 USD'];
-
-    // Muestra/oculta el campo de texto libre cuando eligen "Otro servicio independiente".
-    var dedicacionSelect = document.getElementById('f-dedicacion');
-    var dedicacionOtroWrap = document.getElementById('dedicacion-otro-wrap');
-    var dedicacionOtroInput = document.getElementById('f-dedicacion-otro');
-    if (dedicacionSelect && dedicacionOtroWrap && dedicacionOtroInput) {
-      dedicacionSelect.addEventListener('change', function(){
-        var esOtro = dedicacionSelect.value === 'Otro servicio independiente';
-        dedicacionOtroWrap.hidden = !esOtro;
-        dedicacionOtroInput.required = esOtro;
-        if (!esOtro) dedicacionOtroInput.value = '';
-      });
-    }
+    // La calificación ya no se decide acá — se mueve al formulario de intake
+    // de Calendly, que está embebido en gracias.html. Este formulario solo
+    // recolecta datos de contacto básicos, así que todos los envíos van a
+    // la misma página de agradecimiento.
 
     form.addEventListener('submit', function(e){
       e.preventDefault();
@@ -1299,19 +1228,15 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       btn.innerHTML = 'Enviando…';
 
       var formData = new FormData(form);
-      var rango = formData.get('rangoInversion');
-      var califica = RANGOS_CALIFICAN.indexOf(rango) !== -1;
 
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         body: formData,
         mode: 'no-cors'
       }).then(function(){
-        // Evento de conversión real: se dispara al completar y enviar el
-        // formulario, sin importar si califica o no (calificar es un filtro
-        // de negocio aparte, no cambia que hubo un lead).
+        // Evento de conversión real: se dispara al completar y enviar el formulario.
         if (typeof fbq === 'function') { fbq('track', 'Lead'); }
-        window.location.href = califica ? 'gracias.html' : 'no-califica.html';
+        window.location.href = 'gracias.html';
       }).catch(function(){
         errorEl.hidden = false;
         btn.disabled = false;
