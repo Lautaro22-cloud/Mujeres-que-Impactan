@@ -140,6 +140,106 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     </div>
 
+    <script>
+      /**
+       * Tracking de eventos Calendly — Página de gracias, Mujeres que Impactan
+       * ------------------------------------------------------------------
+       * Mide los 2 eventos reales que expone el embed de Calendly vía postMessage:
+       *   1. date_and_time_selected → llegó al paso de preguntas de calificación
+       *   2. event_scheduled        → completó todo y agendó
+       *
+       * La diferencia entre 1 y 2 es tu métrica de abandono dentro del formulario
+       * de preguntas (Calendly no expone un evento intermedio campo por campo).
+       *
+       * Requiere: el snippet base del Meta Pixel ya cargado en la página (fbq).
+       * Pegar este script DESPUÉS del embed de Calendly en la página de gracias.
+       *
+       * Destinos:
+       *   - Clarity: ambos eventos, como eventos custom, para poder filtrar
+       *     grabaciones por paso del embed.
+       *   - Meta Pixel: "date_and_time_selected" va como evento custom
+       *     (no tiene equivalente estándar en Meta). "event_scheduled" va
+       *     como evento ESTÁNDAR "Schedule" — así podés usarlo directo como
+       *     evento de conversión/optimización en campañas.
+       */
+
+      (function () {
+        // Evita disparar el mismo evento más de una vez por sesión de página
+        var yaDisparado = { seleccionoHorario: false, agendo: false };
+
+        window.addEventListener("message", function (e) {
+          // Calendly solo manda eventos con este shape; filtramos ruido de otros postMessage
+          if (!isCalendlyEvent(e)) return;
+
+          var tipo = e.data.event;
+
+          if (tipo === "calendly.date_and_time_selected" && !yaDisparado.seleccionoHorario) {
+            yaDisparado.seleccionoHorario = true;
+            registrarEvento({
+              clarityEvent: "calendly_seleccion_horario",
+              metaMethod: "trackCustom",
+              metaEvent: "CalendlySeleccionoHorario",
+              params: { content_name: "Mujeres que Impactan - Selección de horario" },
+            });
+          }
+
+          if (tipo === "calendly.event_scheduled" && !yaDisparado.agendo) {
+            yaDisparado.agendo = true;
+            registrarEvento({
+              clarityEvent: "calendly_llamada_agendada",
+              metaMethod: "track", // evento estándar de Meta, no trackCustom
+              metaEvent: "Schedule",
+              params: { content_name: "Mujeres que Impactan - Llamada agendada" },
+            });
+          }
+        });
+
+        function isCalendlyEvent(e) {
+          return (
+            e.data &&
+            typeof e.data === "object" &&
+            e.data.event &&
+            typeof e.data.event === "string" &&
+            e.data.event.indexOf("calendly.") === 0
+          );
+        }
+
+        function registrarEvento(config) {
+          // 1) Clarity — para filtrar grabaciones de sesión por paso del embed
+          if (typeof clarity === "function") {
+            clarity("event", config.clarityEvent);
+          } else {
+            console.warn("[Calendly Tracking] clarity no está definido todavía.");
+          }
+
+          // 2) Meta Pixel — estándar ("track") o custom ("trackCustom") según el evento
+          if (typeof fbq === "function") {
+            fbq(config.metaMethod, config.metaEvent, config.params);
+          } else {
+            console.warn("[Calendly Tracking] fbq no está definido todavía.");
+          }
+
+          // 3) Log a consola para verificar en vivo mientras se prueba
+          console.log("[Calendly Tracking]", config.metaEvent, config.params);
+
+          // 4) Opcional: si más adelante querés mandarlo también a tu Google Apps Script
+          //    (para verlo en la misma hoja que Leads/Calificados), descomentar y
+          //    completar la URL del Web App de Apps Script:
+          //
+          // fetch("URL_DE_TU_APPS_SCRIPT", {
+          //   method: "POST",
+          //   mode: "no-cors",
+          //   headers: { "Content-Type": "application/json" },
+          //   body: JSON.stringify({
+          //     tipo: config.metaEvent,
+          //     timestamp: new Date().toISOString(),
+          //     utm_content: new URLSearchParams(window.location.search).get("utm_content"),
+          //   }),
+          // });
+        }
+      })();
+    </script>
+
     <p class="whatsapp-note">Si no ves horarios que te sirvan o tenés dudas antes de agendar, escribime por WhatsApp al <a href="https://wa.me/541141945780" style="color:var(--wine); font-weight:700; text-decoration:none;">+54 11 4194-5780</a>.</p>
   </div>
 </body>
