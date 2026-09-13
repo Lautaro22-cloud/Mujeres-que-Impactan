@@ -862,9 +862,15 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
         </div>
       </div>
 
-      <div class="field">
-        <label for="f-whatsapp">WhatsApp *</label>
-        <input required id="f-whatsapp" name="whatsapp" type="tel" placeholder="+54 9 11 1234 5678">
+      <div class="form-row" style="display:grid; grid-template-columns:110px 1fr; gap:18px;">
+        <div class="field">
+          <label for="f-caracteristica">Código de área *</label>
+          <input required id="f-caracteristica" name="caracteristica" type="text" placeholder="Ej: 11" maxlength="5">
+        </div>
+        <div class="field">
+          <label for="f-whatsapp-numero">WhatsApp (sin 0 ni 15) *</label>
+          <input required id="f-whatsapp-numero" name="whatsappNumero" type="tel" placeholder="41945780">
+        </div>
       </div>
 
       <div class="field">
@@ -1171,7 +1177,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   //    éxito apenas el request se envía sin error de red. Es el patrón estándar
   //    para este tipo de integración.
   (function(){
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz6z6fgdwmM0-I7SHEdhkQUbqaPMAL-9mzirJBfFc3VM53V3RdTMy56AbWQYJd4yBuC/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyw-h70oMekQnzHfWSyS6MuSh7klJbtXB3pahahPUS06wkHQst-KokhFFPI0ZC20fCe/exec";
     var form = document.getElementById('qualifying-form');
     var errorEl = document.getElementById('form-error');
     if(!form) return;
@@ -1198,6 +1204,16 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       btn.innerHTML = 'Enviando…';
 
       var formData = new FormData(form);
+
+      // Arma el WhatsApp completo y con formato fijo, para que a Mar le
+      // lleguen siempre completos y buscables (código de país + 9 fijo +
+      // área + número), sin depender de que cada persona lo tipee bien.
+      // Se limpia todo lo que no sea dígito antes de armarlo, por si alguien
+      // escribe espacios, guiones o un 0/15 de más.
+      var caracteristica = (formData.get('caracteristica') || '').replace(/\D/g, '');
+      var numero = (formData.get('whatsappNumero') || '').replace(/\D/g, '');
+      var whatsappCompleto = '+54 9 ' + caracteristica + ' ' + numero;
+      formData.set('whatsapp', whatsappCompleto);
 
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
