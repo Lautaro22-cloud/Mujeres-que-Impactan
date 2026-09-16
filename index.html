@@ -862,13 +862,18 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
         </div>
       </div>
 
+      <div class="field">
+        <label for="f-email">Correo electrónico *</label>
+        <input required id="f-email" name="email" type="email">
+      </div>
+
       <div class="form-row" style="display:grid; grid-template-columns:110px 1fr; gap:18px;">
         <div class="field">
-          <label for="f-caracteristica">Código de área</label>
+          <label for="f-caracteristica">Código de área *</label>
           <input required id="f-caracteristica" name="caracteristica" type="text" placeholder="Ej: 11" maxlength="5">
         </div>
         <div class="field">
-          <label for="f-whatsapp-numero">WhatsApp (sin 0 ni 15)</label>
+          <label for="f-whatsapp-numero">WhatsApp (sin 0 ni 15) *</label>
           <input required id="f-whatsapp-numero" name="whatsappNumero" type="tel" placeholder="41945780">
         </div>
       </div>
@@ -1177,7 +1182,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   //    éxito apenas el request se envía sin error de red. Es el patrón estándar
   //    para este tipo de integración.
   (function(){
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyw-h70oMekQnzHfWSyS6MuSh7klJbtXB3pahahPUS06wkHQst-KokhFFPI0ZC20fCe/exec";
+    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTTNMenosBaSvgf0KGVbyiyKjxaMZYK41y8vUxSrUoFrHfd--IH84iGofF9NbBe_C9/exec";
     var form = document.getElementById('qualifying-form');
     var errorEl = document.getElementById('form-error');
     if(!form) return;
