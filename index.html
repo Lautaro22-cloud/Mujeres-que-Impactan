@@ -721,7 +721,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     .sticky-cta-text{display:block;}
   }
 </style>
-<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
   // Salvaguarda contra el salto directo al formulario al abrir desde el anuncio.
   // Tiene 3 capas porque el navegador interno de Instagram (IAB) puede saltarse
@@ -753,12 +752,10 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
   setTimeout(function(){ window.scrollTo(0, 0); }, 50);
   setTimeout(function(){ window.scrollTo(0, 0); }, 400);
 
-  // Carga del VSL recién cuando la sección entra en pantalla, y fuerza el
-  // play por API en vez de confiar solo en el parámetro autoplay=1 de la URL
-  // — algunas cuentas de Vimeo (planes gratuitos/Plus) ignoran ese parámetro
-  // y solo permiten autoplay real en planes pagos. Pedirle "play" directo al
-  // reproductor por la API es una acción de control normal, no un embed
-  // especial, así que no depende de ese permiso.
+  // Carga (y autoplay) del VSL recién cuando la sección entra en pantalla.
+  // YouTube sí respeta autoplay=1&mute=1 directo por parámetro de URL
+  // (a diferencia de Vimeo en cuentas gratuitas), así que no hace falta
+  // forzar el play por API acá.
   document.addEventListener('DOMContentLoaded', function(){
     var vslFrame = document.getElementById('vsl-frame');
     var vslIframe = document.getElementById('vsl-iframe');
@@ -769,18 +766,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
         if(entry.isIntersecting){
           vslIframe.src = vslIframe.getAttribute('data-src');
           vslObserver.unobserve(vslFrame);
-
-          try {
-            if (window.Vimeo && window.Vimeo.Player) {
-              var vslPlayer = new Vimeo.Player(vslIframe);
-              vslPlayer.setVolume(0).then(function(){
-                return vslPlayer.play();
-              }).catch(function(){
-                // Si el navegador igual bloquea el autoplay por alguna política
-                // propia, no pasa nada: queda el botón de play normal de Vimeo.
-              });
-            }
-          } catch(e) {}
         }
       });
     }, {threshold: 0.5});
@@ -791,7 +776,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
 </head>
 <body>
 
-<div class="filter-banner">SOLO PARA MUJERES CON EXPERIENCIA QUE BRINDAN UN SERVICIO PROFESIONAL Y DEPENDEN DE SESIONES 1 A 1 O DEL BOCA EN BOCA</div>
+<div class="filter-banner">SOLO PARA MUJERES CON EXPERIENCIA QUE BRINDAN UN SERVICIO PROFESIONAL Y DEPENDEN DEL 1 A 1 O DEL BOCA EN BOCA</div>
 
 <!-- ================= HERO ================= -->
 <section class="hero">
@@ -813,7 +798,7 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
 
     <span class="step-label">Paso 1 · Mirá el video</span>
 
-    <!-- VSL de Mar (Vimeo). muted=1 sumado a tus parámetros: sin esto, la mayoría
+    <!-- VSL de Mar (YouTube). mute=1 sumado a autoplay=1: sin esto, la mayoría
          de los navegadores (Chrome, Safari, in-app browser de Instagram) bloquean
          el autoplay directamente y el video ni arranca.
          El iframe arranca SIN src (ver data-src) — un script más abajo recién
@@ -822,9 +807,9 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
     <div class="video-frame" id="vsl-frame">
       <iframe
         id="vsl-iframe"
-        data-src="https://player.vimeo.com/video/1217744577?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=1&amp;muted=1"
+        data-src="https://www.youtube.com/embed/P_s5s7B2Hc0?autoplay=1&amp;mute=1&amp;rel=0&amp;modestbranding=1&amp;playsinline=1"
         width="1920" height="1080" frameborder="0"
-        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         referrerpolicy="strict-origin-when-cross-origin"
         title="Mujeres que Impactan Agosto 2026">
       </iframe>
@@ -870,11 +855,11 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
 
       <div class="form-row" style="display:grid; grid-template-columns:110px 1fr; gap:18px;">
         <div class="field">
-          <label for="f-caracteristica">Código de área </label>
+          <label for="f-caracteristica">Código de área *</label>
           <input required id="f-caracteristica" name="caracteristica" type="text" placeholder="Ej: 11" maxlength="5">
         </div>
         <div class="field">
-          <label for="f-whatsapp-numero">WhatsApp (sin 0 ni 15) </label>
+          <label for="f-whatsapp-numero">WhatsApp (sin 0 ni 15) *</label>
           <input required id="f-whatsapp-numero" name="whatsappNumero" type="tel" placeholder="41945780">
         </div>
       </div>
