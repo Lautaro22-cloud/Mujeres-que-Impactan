@@ -100,9 +100,96 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
 
   .whatsapp-note{
     text-align:center;
-    font-size:14px;
+    font-size:16px;
     color:var(--ink-soft);
-    margin-top:28px;
+    margin-top:32px;
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:26px 24px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+  }
+  .whatsapp-note-icon{ font-size:22px; }
+  .whatsapp-note-text{ max-width:440px; }
+  .whatsapp-note-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    background:#25D366;
+    color:#fff;
+    font-weight:700;
+    font-size:15px;
+    text-decoration:none;
+    padding:13px 24px;
+    border-radius:8px;
+  }
+
+  /* Popup de WhatsApp (exit intent / tiempo en página) */
+  .wa-popup-overlay{
+    position:fixed; inset:0;
+    background:rgba(42,32,25,0.55);
+    display:none;
+    align-items:center; justify-content:center;
+    z-index:9999;
+    padding:20px;
+  }
+  .wa-popup-overlay.visible{ display:flex; }
+  .wa-popup{
+    background:var(--paper);
+    border-radius:14px;
+    max-width:400px;
+    width:100%;
+    padding:32px 28px 28px;
+    position:relative;
+    text-align:center;
+    box-shadow:0 24px 60px rgba(0,0,0,0.3);
+    animation:waPopupIn 0.25s ease-out;
+  }
+  @keyframes waPopupIn{
+    from{ opacity:0; transform:translateY(12px) scale(0.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .wa-popup-close{
+    position:absolute; top:12px; right:14px;
+    background:none; border:none;
+    font-size:22px; line-height:1;
+    color:var(--ink-soft);
+    cursor:pointer;
+    padding:4px;
+  }
+  .wa-popup-icon{
+    width:52px; height:52px;
+    border-radius:50%;
+    background:var(--sage);
+    color:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px;
+    margin:0 auto 16px;
+  }
+  .wa-popup h3{
+    font-family:'Fraunces', serif; font-weight:500;
+    font-size:1.25rem;
+    color:var(--ink);
+    margin-bottom:10px;
+  }
+  .wa-popup p{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+    line-height:1.5;
+  }
+  .wa-popup-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    background:#25D366;
+    color:#fff;
+    font-weight:700;
+    font-size:15px;
+    text-decoration:none;
+    padding:14px 22px;
+    border-radius:8px;
+    width:100%;
   }
 </style>
 </head>
@@ -240,7 +327,94 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       })();
     </script>
 
-    <p class="whatsapp-note">Si no ves horarios que te sirvan o tenés dudas antes de agendar, escribime por WhatsApp al <a href="https://wa.me/541141945780" style="color:var(--wine); font-weight:700; text-decoration:none;">+54 11 4194-5780</a>.</p>
+    <div class="whatsapp-note">
+      <span class="whatsapp-note-icon">💬</span>
+      <p class="whatsapp-note-text">Si no ves horarios que te sirvan o tenés dudas antes de agendar, escribime por WhatsApp.</p>
+      <a href="https://wa.me/541141945780?text=Hola%20Mar!%20Vengo%20de%20la%20p%C3%A1gina.%20Quisiera%20hacerte%20una%20consulta" target="_blank" rel="noopener" class="whatsapp-note-btn">Escribirle a Mar por WhatsApp</a>
+    </div>
   </div>
+
+  <!-- Popup de WhatsApp: se muestra si la persona está por irse (exit intent en desktop)
+       o si pasó un tiempo prudencial en la página sin agendar (todos los dispositivos,
+       incluido mobile, donde no existe exit intent por mouse). -->
+  <div class="wa-popup-overlay" id="wa-popup-overlay">
+    <div class="wa-popup">
+      <button class="wa-popup-close" id="wa-popup-close" aria-label="Cerrar">×</button>
+      <div class="wa-popup-icon">💬</div>
+      <h3>¿No encontrás día u horario?</h3>
+      <p>Si tenés dudas o no ves ningún horario que te sirva, escribime directo por WhatsApp y lo vemos juntas.</p>
+      <a href="https://wa.me/541141945780?text=Hola%20Mar!%20Vengo%20de%20la%20p%C3%A1gina.%20Quisiera%20hacerte%20una%20consulta" target="_blank" rel="noopener" class="wa-popup-btn" id="wa-popup-btn">
+        Hablar con Mar por WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * Popup de WhatsApp — Página de gracias, Mujeres que Impactan
+     * ------------------------------------------------------------------
+     * Objetivo: recuperar leads que llegan a agendar pero no terminan de
+     * hacerlo (no encuentran horario, les surge una duda, etc.)
+     *
+     * Dos disparadores, porque "exit intent" por mouse no existe en mobile:
+     *   1. Desktop: el mouse sale por arriba de la ventana (típico gesto de
+     *      ir a cerrar la pestaña o volver atrás).
+     *   2. Todos los dispositivos: pasaron ~45s en la página sin agendar.
+     *
+     * Se suprime por completo si la persona ya agendó (evento
+     * calendly.event_scheduled) y se muestra una sola vez por visita.
+     */
+    (function () {
+      var overlay = document.getElementById('wa-popup-overlay');
+      var closeBtn = document.getElementById('wa-popup-close');
+      var waBtn = document.getElementById('wa-popup-btn');
+
+      var yaAgendo = false;
+      var yaSeMostro = false;
+      var TIEMPO_ESPERA_MS = 45000;
+
+      function mostrarPopup() {
+        if (yaAgendo || yaSeMostro) return;
+        yaSeMostro = true;
+        overlay.classList.add('visible');
+        if (typeof clarity === 'function') clarity('event', 'wa_popup_mostrado');
+      }
+
+      function cerrarPopup() {
+        overlay.classList.remove('visible');
+      }
+
+      closeBtn.addEventListener('click', cerrarPopup);
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) cerrarPopup();
+      });
+      waBtn.addEventListener('click', function () {
+        if (typeof clarity === 'function') clarity('event', 'wa_popup_click');
+        if (typeof fbq === 'function') fbq('trackCustom', 'WaPopupClick');
+      });
+
+      // Disparador 1: exit intent en desktop (mouse sale por arriba de la ventana)
+      document.addEventListener('mouseout', function (e) {
+        if (!e.relatedTarget && e.clientY <= 0) {
+          mostrarPopup();
+        }
+      });
+
+      // Disparador 2: tiempo en página, para mobile y para quienes no disparan mouseout
+      setTimeout(mostrarPopup, TIEMPO_ESPERA_MS);
+
+      // Detecta si ya agendó, escuchando el mismo postMessage de Calendly
+      window.addEventListener('message', function (e) {
+        if (
+          e.data &&
+          typeof e.data === 'object' &&
+          e.data.event === 'calendly.event_scheduled'
+        ) {
+          yaAgendo = true;
+          cerrarPopup();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
