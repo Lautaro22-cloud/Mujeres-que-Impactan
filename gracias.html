@@ -356,10 +356,20 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
      * Objetivo: recuperar leads que llegan a agendar pero no terminan de
      * hacerlo (no encuentran horario, les surge una duda, etc.)
      *
-     * Dos disparadores, porque "exit intent" por mouse no existe en mobile:
-     *   1. Desktop: el mouse sale por arriba de la ventana (típico gesto de
-     *      ir a cerrar la pestaña o volver atrás).
-     *   2. Todos los dispositivos: pasaron ~45s en la página sin agendar.
+     * Se muestra SOLO ante intención real de abandono, no por tiempo en
+     * página (eso disparaba falsos positivos mientras alguien seguía
+     * completando el formulario de Calendly con normalidad). Dos casos:
+     *
+     *   1. Desktop: el mouse sale por arriba de la ventana del navegador
+     *      (gesto típico de ir a cerrar la pestaña o cambiar de tab).
+     *      Se usa "mouseleave" sobre el documento —a diferencia de
+     *      "mouseout"— porque no se dispara al entrar el mouse al iframe
+     *      de Calendly, que es la causa del falso positivo anterior.
+     *
+     *   2. Todos los dispositivos (incluido mobile): la persona aprieta
+     *      "atrás" para volver a la landing. Se intercepta con un estado
+     *      extra en el historial (history.pushState) para que el primer
+     *      "atrás" muestre el popup en vez de sacarla de la página.
      *
      * Se suprime por completo si la persona ya agendó (evento
      * calendly.event_scheduled) y se muestra una sola vez por visita.
@@ -371,7 +381,6 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
 
       var yaAgendo = false;
       var yaSeMostro = false;
-      var TIEMPO_ESPERA_MS = 45000;
 
       function mostrarPopup() {
         if (yaAgendo || yaSeMostro) return;
@@ -394,14 +403,20 @@ src="https://www.facebook.com/tr?id=1056257650151326&ev=PageView&noscript=1"
       });
 
       // Disparador 1: exit intent en desktop (mouse sale por arriba de la ventana)
-      document.addEventListener('mouseout', function (e) {
-        if (!e.relatedTarget && e.clientY <= 0) {
+      document.addEventListener('mouseleave', function (e) {
+        if (e.clientY <= 0) {
           mostrarPopup();
         }
       });
 
-      // Disparador 2: tiempo en página, para mobile y para quienes no disparan mouseout
-      setTimeout(mostrarPopup, TIEMPO_ESPERA_MS);
+      // Disparador 2: intento de volver atrás a la landing (desktop y mobile)
+      history.pushState(null, '', location.href);
+      window.addEventListener('popstate', function () {
+        if (!yaAgendo) {
+          mostrarPopup();
+          history.pushState(null, '', location.href);
+        }
+      });
 
       // Detecta si ya agendó, escuchando el mismo postMessage de Calendly
       window.addEventListener('message', function (e) {
